@@ -1,16 +1,31 @@
 import { StoreStatus } from "@/components/public/StoreStatus";
 import { ProductGrid } from "@/components/public/ProductGrid";
-import { MOCK_STORE, MOCK_HOURS, MOCK_PRODUCTS } from "@/lib/mock";
-import { MapPin, Phone, AtSign, Globe } from "lucide-react";
+import { MapPin, Phone, AtSign, Globe, Store } from "lucide-react";
 import { notFound } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
-export default function StorePage({ params }: { params: { slug: string } }) {
-  // Simula fetch no banco de dados pelo slug
-  const store = MOCK_STORE.slug === params.slug ? MOCK_STORE : null;
+export const revalidate = 0;
 
-  if (!store) {
+export default async function StorePage({ params }: { params: { slug: string } }) {
+  // Busca a loja pelo slug
+  const { data: store, error: storeError } = await supabase
+    .from('stores')
+    .select('*')
+    .eq('slug', params.slug)
+    .single();
+
+  if (storeError || !store) {
     notFound();
   }
+
+  // Busca os horários e produtos
+  const [hoursResponse, productsResponse] = await Promise.all([
+    supabase.from('operating_hours').select('*').eq('store_id', store.id),
+    supabase.from('products').select('*').eq('store_id', store.id)
+  ]);
+
+  const hours = hoursResponse.data || [];
+  const products = productsResponse.data || [];
 
   return (
     <main className="min-h-screen bg-zinc-50 pb-20">
@@ -29,13 +44,15 @@ export default function StorePage({ params }: { params: { slug: string } }) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
         {/* Cabeçalho da Loja */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row gap-6 items-start md:items-end">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-white bg-white overflow-hidden shadow-md shrink-0">
-            {store.logo_url && (
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-white bg-white overflow-hidden shadow-md shrink-0 flex items-center justify-center">
+            {store.logo_url ? (
               <img 
                 src={store.logo_url} 
                 alt={`Logo da ${store.name}`}
                 className="w-full h-full object-cover"
               />
+            ) : (
+              <Store className="w-12 h-12 text-gray-300" />
             )}
           </div>
           
@@ -55,7 +72,7 @@ export default function StorePage({ params }: { params: { slug: string } }) {
           </div>
 
           <div className="flex flex-col gap-3 w-full md:w-auto">
-            <StoreStatus hours={MOCK_HOURS} />
+            <StoreStatus hours={hours} />
           </div>
         </div>
 
@@ -79,12 +96,12 @@ export default function StorePage({ params }: { params: { slug: string } }) {
               <div className="mt-6 pt-6 border-t border-gray-100">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">Redes Sociais</h3>
                 <div className="flex gap-3">
-                  {store.social_links.instagram && (
+                  {store.social_links?.instagram && (
                     <a href={store.social_links.instagram} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-50 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
                       <AtSign className="w-5 h-5" />
                     </a>
                   )}
-                  {store.social_links.website && (
+                  {store.social_links?.website && (
                     <a href={store.social_links.website} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-50 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
                       <Globe className="w-5 h-5" />
                     </a>
@@ -97,7 +114,7 @@ export default function StorePage({ params }: { params: { slug: string } }) {
           {/* Coluna da Direita: Catálogo de Produtos */}
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Produtos e Serviços</h2>
-            <ProductGrid products={MOCK_PRODUCTS} storePhone={store.phone_whatsapp} />
+            <ProductGrid products={products} storePhone={store.phone_whatsapp} />
           </div>
         </div>
       </div>

@@ -1,15 +1,30 @@
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Header } from "@/components/public/Header";
 import { MarketplaceGrid } from "@/components/public/MarketplaceGrid";
-import { MOCK_PRODUCTS, MOCK_STORES_LIST } from "@/lib/mock";
+import { supabase } from "@/lib/supabase";
 
-export default function Home() {
+export const revalidate = 0; // Para sempre buscar os dados mais recentes na home page
+
+export default async function Home() {
+  // Busca os produtos e as lojas do Supabase
+  const { data: productsData } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const { data: storesData } = await supabase
+    .from('stores')
+    .select('*');
+
+  const products = productsData || [];
+  const stores = storesData || [];
+
   // Converte a lista de lojas num mapa para o Grid acessar fácil O(1)
-  const storesMap = MOCK_STORES_LIST.reduce((acc, store) => {
+  const storesMap = stores.reduce((acc, store) => {
     acc[store.id] = {
       name: store.name,
       phone: store.phone_whatsapp,
-      location: store.address.split('-')[1]?.trim() || store.address, // pega a cidade/bairro se tiver
+      location: store.address.split('-')[1]?.trim() || store.address,
       slug: store.slug
     };
     return acc;
@@ -51,10 +66,10 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Anúncios Recentes</h2>
-            <span className="text-sm text-gray-500">{MOCK_PRODUCTS.length} resultados</span>
+            <span className="text-sm text-gray-500">{products.length} resultados</span>
           </div>
 
-          <MarketplaceGrid products={MOCK_PRODUCTS} storesMap={storesMap} />
+          <MarketplaceGrid products={products} storesMap={storesMap} />
           
           <div className="mt-12 flex justify-center">
             <button className="bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-full hover:bg-gray-50 transition-colors shadow-sm">

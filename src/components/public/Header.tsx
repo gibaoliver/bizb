@@ -24,10 +24,7 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-sm font-medium text-gray-600 hover:text-indigo-600">
-              Vender / Anunciar
-            </Link>
-            <Link href="/admin" className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+            <Link href="/login" className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
               <User className="w-4 h-4" />
               Entrar
             </Link>
