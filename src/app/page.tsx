@@ -34,23 +34,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f9] flex flex-col font-sans">
-      {/* Botões Flutuantes de Demonstração (como na referência) */}
-      <div className="fixed right-4 top-24 z-40 hidden xl:flex flex-col gap-2.5">
-        <a 
-          href="#anuncios" 
-          className="bg-[#68a834] hover:bg-[#5b952c] text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 hover:scale-105"
-        >
-          <ShoppingCart className="w-3.5 h-3.5" />
-          <span>Comprar agora</span>
-        </a>
-        <Link 
-          href="/admin" 
-          className="bg-[#2441e7] hover:bg-[#1a33c7] text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 hover:scale-105"
-        >
-          <Eye className="w-3.5 h-3.5" />
-          <span>Demonstração do administrador</span>
-        </Link>
-      </div>
+
 
       <Header />
 
@@ -79,16 +63,7 @@ export default async function Home() {
                       className="object-cover w-full h-full object-top"
                     />
                   </div>
-                  {/* Badge simulando o celular com anúncio */}
-                  <div className="absolute -bottom-3 right-0 bg-white text-gray-900 rounded-xl p-2 shadow-xl border border-gray-100 flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#f8485e] flex items-center justify-center text-white text-xs font-bold">
-                      ✓
-                    </div>
-                    <div className="text-left pr-2">
-                      <p className="text-[10px] font-bold text-gray-500 uppercase leading-none">Anúncio</p>
-                      <p className="text-xs font-extrabold text-[#f8485e]">Publicado!</p>
-                    </div>
-                  </div>
+
                 </div>
               </div>
 
